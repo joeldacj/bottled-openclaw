@@ -90,6 +90,8 @@ else:
         },
     }
     gw["trustedProxies"] = ["0.0.0.0/0", "::/0"]
+# Device pairing needs the public URL, since the gateway itself may be loopback-only.
+gw["publicOrigin"] = "${APP_ORIGIN}"
 control_ui = gw.setdefault("controlUi", {})
 control_ui["allowedOrigins"] = ["${APP_ORIGIN}"]
 control_ui["dangerouslyDisableDeviceAuth"] = True
