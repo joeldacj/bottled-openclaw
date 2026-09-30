@@ -75,7 +75,10 @@ if password:
     # When the router reaches the gateway from the host's own interface IP,
     # OpenClaw's trusted-proxy spoofing guard rejects it
     # (trusted_proxy_local_interface_source); password auth sidesteps that.
+    # Trust no proxy: a wildcard trustedProxies that includes the host's own IP
+    # makes forwarded headers unattributable (proxy_attribution_required).
     gw["auth"] = {"mode": "password", "password": password}
+    gw.pop("trustedProxies", None)
 else:
     gw["auth"] = {
         "mode": "trusted-proxy",
@@ -86,7 +89,7 @@ else:
             "allowLoopback": True,
         },
     }
-gw["trustedProxies"] = ["0.0.0.0/0", "::/0"]
+    gw["trustedProxies"] = ["0.0.0.0/0", "::/0"]
 control_ui = gw.setdefault("controlUi", {})
 control_ui["allowedOrigins"] = ["${APP_ORIGIN}"]
 control_ui["dangerouslyDisableDeviceAuth"] = True
