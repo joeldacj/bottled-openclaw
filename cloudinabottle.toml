@@ -23,4 +23,7 @@ shortname = "secrets"
 version = ">=0.1.0"
 grants = [
     { key = "ANTHROPIC_API_KEY" },
+    { key = "OPENAI_API_KEY" },
+    { key = "GEMINI_API_KEY" },
+    { key = "OPENCLAW_GATEWAY_PASSWORD" },
 ]
