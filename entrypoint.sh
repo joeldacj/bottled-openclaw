@@ -91,7 +91,8 @@ else:
     }
     gw["trustedProxies"] = ["0.0.0.0/0", "::/0"]
 # Device pairing needs the public URL, since the gateway itself may be loopback-only.
-gw["publicOrigin"] = "${APP_ORIGIN}"
+# Only a default: it can be pointed elsewhere (e.g. a Tailscale serve URL) and stays.
+gw.setdefault("publicOrigin", "${APP_ORIGIN}")
 control_ui = gw.setdefault("controlUi", {})
 control_ui["allowedOrigins"] = ["${APP_ORIGIN}"]
 control_ui["dangerouslyDisableDeviceAuth"] = True
