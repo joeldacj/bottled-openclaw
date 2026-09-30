@@ -113,5 +113,12 @@ if [ -n "$OPENCLAW_GATEWAY_PASSWORD" ]; then
     set -- "$@" --bind loopback --port 18790
 fi
 
-export ANTHROPIC_API_KEY OPENAI_API_KEY GEMINI_API_KEY
-exec runuser -u node --whitelist-environment=ANTHROPIC_API_KEY,OPENAI_API_KEY,GEMINI_API_KEY -- "$@"
+# Point OpenClaw at the real directory: it refuses to write config or load
+# skills through the ~/.openclaw symlink ("must be a real directory",
+# "symlink prefix resolves outside the root ancestry"). The symlink stays so
+# older absolute paths in the config keep resolving.
+OPENCLAW_STATE_DIR="$DATA_DIR"
+OPENCLAW_CONFIG_PATH="$DATA_DIR/openclaw.json"
+
+export ANTHROPIC_API_KEY OPENAI_API_KEY GEMINI_API_KEY OPENCLAW_STATE_DIR OPENCLAW_CONFIG_PATH
+exec runuser -u node --whitelist-environment=ANTHROPIC_API_KEY,OPENAI_API_KEY,GEMINI_API_KEY,OPENCLAW_STATE_DIR,OPENCLAW_CONFIG_PATH -- "$@"
