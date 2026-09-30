@@ -75,8 +75,8 @@ if password:
     # When the router reaches the gateway from the host's own interface IP,
     # OpenClaw's trusted-proxy spoofing guard rejects it
     # (trusted_proxy_local_interface_source); password auth sidesteps that.
-    # Trust no proxy: a wildcard trustedProxies that includes the host's own IP
-    # makes forwarded headers unattributable (proxy_attribution_required).
+    # Trust no proxy; forwarded headers are stripped by the in-container shim
+    # (strip-forwarded-proxy.mjs) so they can't trip proxy_attribution_required.
     gw["auth"] = {"mode": "password", "password": password}
     gw.pop("trustedProxies", None)
 else:
@@ -105,6 +105,13 @@ if "model" not in agents_defaults:
 
 cfg_path.write_text(json.dumps(cfg, indent=2))
 PY
+
+if [ -n "$OPENCLAW_GATEWAY_PASSWORD" ]; then
+    # Gateway moves to loopback:18790; the shim on :18789 strips forwarded headers.
+    # ponytail: shim isn't supervised; if it dies the app 502s until reload.
+    runuser -u node -- node /openhost-strip-forwarded-proxy.mjs &
+    set -- "$@" --bind loopback --port 18790
+fi
 
 export ANTHROPIC_API_KEY OPENAI_API_KEY GEMINI_API_KEY
 exec runuser -u node --whitelist-environment=ANTHROPIC_API_KEY,OPENAI_API_KEY,GEMINI_API_KEY -- "$@"

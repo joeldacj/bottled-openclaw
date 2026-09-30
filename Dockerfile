@@ -4,6 +4,7 @@ FROM ghcr.io/openclaw/openclaw:2026.9.7@sha256:0da12cd49983fcb5e4915fd3135ce7a33
 USER root
 
 COPY entrypoint.sh /openhost-entrypoint.sh
+COPY strip-forwarded-proxy.mjs /openhost-strip-forwarded-proxy.mjs
 RUN chmod +x /openhost-entrypoint.sh \
     && rm -rf /home/node/.openclaw
 
