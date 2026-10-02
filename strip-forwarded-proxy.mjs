@@ -12,7 +12,10 @@ const STRIP = new Set(["forwarded", "x-forwarded-for", "x-forwarded-host", "x-fo
 const cleanHeaders = (raw) => {
   const out = [];
   for (let i = 0; i < raw.length; i += 2) {
-    if (!STRIP.has(raw[i].toLowerCase())) out.push(raw[i], raw[i + 1]);
+    const name = raw[i].toLowerCase();
+    // tailscale serve adds Tailscale-User-* identity headers, which OpenClaw
+    // also treats as proxy-shaped and rejects.
+    if (!STRIP.has(name) && !name.startsWith("tailscale-")) out.push(raw[i], raw[i + 1]);
   }
   return out;
 };
